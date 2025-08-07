@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Notification Viewer</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    .card { min-height: 150px; }
+    .card-columns { column-count: 3; }
+  </style>
+</head>
+<body class="bg-light">
+  <div class="container my-4">
+    <h2 class="mb-4">📲 Notification Viewer</h2>
+
+    <div class="row mb-3">
+      <div class="col-md-3">
+        <input type="text" id="username" class="form-control" placeholder="Enter username">
+      </div>
+      <div class="col-md-3">
+        <input type="date" id="startDate" class="form-control">
+      </div>
+      <div class="col-md-3">
+        <input type="date" id="endDate" class="form-control">
+      </div>
+      <div class="col-md-3">
+        <select id="packageFilter" class="form-select">
+          <option value="">📦 All Packages</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <button class="btn btn-primary" onclick="loadNotifications()">🔍 Fetch Notifications</button>
+    </div>
+
+    <div id="notifications" class="row g-3"></div>
+
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <button class="btn btn-secondary" id="prevPage">⏮ Previous</button>
+      <span id="pageInfo">Page 1</span>
+      <button class="btn btn-secondary" id="nextPage">Next ⏭</button>
+    </div>
+  </div>
+
+  <script>
+    let currentPage = 1;
+    let totalPages = 1;
+
+    async function loadNotifications() {
+      const username = document.getElementById('username').value.trim();
+      const start = document.getElementById('startDate').value;
+      const end = document.getElementById('endDate').value;
+      const packageName = document.getElementById('packageFilter').value;
+
+      if (!username) return alert("⚠ Please enter a username");
+
+      const params = new URLSearchParams({
+        page: currentPage,
+        limit: 9
+      });
+
+      if (start) params.append("start", start);
+      if (end) params.append("end", end);
+      if (packageName) params.append("package", packageName);
+
+      const res = await fetch(`/notifications/${username}?${params}`);
+      const data = await res.json();
+
+      const list = document.getElementById('notifications');
+      list.innerHTML = '';
+
+      data.notifications.forEach(n => {
+        const card = document.createElement('div');
+        card.className = "col-md-4";
+        const time = new Date(n.timestamp).toLocaleString();
+        card.innerHTML = `
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h6 class="card-title">${n.package}</h6>
+              <p class="card-text"><strong>${n.title}</strong><br>${n.text}</p>
+              <small class="text-muted">${time}</small>
+            </div>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+
+      currentPage = data.currentPage || 1;
+      totalPages = data.totalPages || 1;
+      document.getElementById('pageInfo').innerText = `Page ${currentPage} of ${totalPages}`;
+
+      updatePackageOptions(data.allPackages || []);
+    }
+
+    function updatePackageOptions(packages) {
+      const select = document.getElementById('packageFilter');
+      const currentValue = select.value;
+      select.innerHTML = `<option value="">📦 All Packages</option>`;
+      [...new Set(packages)].forEach(pkg => {
+        const option = document.createElement('option');
+        option.value = pkg;
+        option.text = pkg;
+        if (pkg === currentValue) option.selected = true;
+        select.appendChild(option);
+      });
+    }
+
+    document.getElementById('nextPage').addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        loadNotifications();
+      }
+    });
+
+    document.getElementById('prevPage').addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        loadNotifications();
+      }
+    });
+  </script>
+</body>
+</html>
