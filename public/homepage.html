@@ -1,127 +1,583 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="auto">
+
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
   <title>Notification Viewer</title>
+
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
     rel="stylesheet"
   />
+
   <style>
-    .card { min-height: 150px; }
-    .card-columns { column-count: 3; }
+
+    body {
+      background:
+        radial-gradient(circle at top right, #1a0000 0%, transparent 25%),
+        radial-gradient(circle at bottom left, #001a12 0%, transparent 25%),
+        #0b0f14;
+
+      color: #e6edf3;
+      font-family: Consolas, monospace;
+      min-height: 100vh;
+    }
+
+    h2 {
+      color: #ff4d6d;
+      font-weight: bold;
+      letter-spacing: 1px;
+
+      text-shadow:
+        0 0 10px rgba(255, 77, 109, 0.25),
+        0 0 20px rgba(0, 255, 157, 0.08);
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .shortcut-box {
+      color: #7ee787;
+      font-size: 13px;
+      border: 1px solid #1f6f4a;
+      background: rgba(0, 255, 157, 0.05);
+      padding: 8px 12px;
+      border-radius: 10px;
+    }
+
+    .shortcut-box span {
+      color: #ff7b72;
+      font-weight: bold;
+    }
+
+    .form-control,
+    .form-select {
+      background: #161b22 !important;
+      border: 1px solid #30363d;
+      color: #e6edf3 !important;
+      border-radius: 12px;
+      padding: 12px;
+      transition: 0.3s ease;
+    }
+
+    .form-control::placeholder {
+      color: #8b949e;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+
+      background: #161b22;
+
+      border-color: #7ee787;
+
+      box-shadow:
+        0 0 0 2px rgba(126, 231, 135, 0.12),
+        0 0 18px rgba(255, 77, 109, 0.08);
+
+      color: white;
+    }
+
+    .card {
+
+      background:
+        linear-gradient(
+          145deg,
+          #161b22,
+          #11161d
+        );
+
+      border: 1px solid #30363d;
+
+      border-radius: 18px;
+
+      overflow: hidden;
+
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+
+      transform:
+        translateY(-5px)
+        scale(1.01);
+
+      border-color: #ff4d6d;
+
+      box-shadow:
+        0 0 18px rgba(255, 77, 109, 0.12),
+        0 0 30px rgba(126, 231, 135, 0.08);
+    }
+
+    .card::before {
+      content: "";
+
+      display: block;
+
+      height: 3px;
+
+      background:
+        linear-gradient(
+          90deg,
+          #ff4d6d,
+          #7ee787
+        );
+    }
+
+    .card-title {
+      color: #7ee787;
+      font-size: 14px;
+      margin-bottom: 12px;
+      word-break: break-word;
+    }
+
+    .card-text {
+      color: #e6edf3;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .text-muted {
+      color: #8b949e !important;
+    }
+
+    .btn-primary {
+
+      background:
+        linear-gradient(
+          135deg,
+          #b22234,
+          #ff4d6d
+        );
+
+      border: none;
+
+      border-radius: 12px;
+
+      color: white;
+
+      padding: 10px 22px;
+
+      font-weight: bold;
+
+      transition: 0.3s ease;
+    }
+
+    .btn-primary:hover {
+
+      transform: translateY(-2px);
+
+      box-shadow:
+        0 0 18px rgba(255, 77, 109, 0.25);
+    }
+
+    .btn-secondary {
+
+      background: #161b22;
+
+      border: 1px solid #30363d;
+
+      color: #7ee787;
+
+      border-radius: 12px;
+
+      padding: 10px 18px;
+
+      transition: 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+
+      background: #1f6f4a;
+
+      color: white;
+
+      border-color: #7ee787;
+
+      box-shadow:
+        0 0 12px rgba(126, 231, 135, 0.18);
+    }
+
+    .btn-danger-custom {
+
+      background:
+        linear-gradient(
+          135deg,
+          #7a1025,
+          #b22234
+        );
+
+      border: none;
+
+      color: white;
+
+      border-radius: 12px;
+
+      padding: 10px 18px;
+
+      transition: 0.3s ease;
+    }
+
+    .btn-danger-custom:hover {
+
+      background:
+        linear-gradient(
+          135deg,
+          #b22234,
+          #ff4d6d
+        );
+
+      box-shadow:
+        0 0 15px rgba(255, 77, 109, 0.2);
+    }
+
+    #pageInfo {
+      color: #ff7b72;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .footer-glow {
+      height: 2px;
+      width: 100%;
+      margin-top: 30px;
+
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          #ff4d6d,
+          #7ee787,
+          transparent
+        );
+
+      opacity: 0.5;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #0b0f14;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background:
+        linear-gradient(
+          #ff4d6d,
+          #7ee787
+        );
+
+      border-radius: 20px;
+    }
+
+    @media (max-width: 768px) {
+
+      h2 {
+        font-size: 24px;
+      }
+
+      .btn-primary,
+      .btn-secondary,
+      .btn-danger-custom {
+        width: 100%;
+      }
+
+      .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
   </style>
 </head>
-<body class="bg-light">
-  <div class="container my-4">
-    <h2 class="mb-4">📲 Notification Viewer</h2>
+
+<body>
+
+  <div class="container py-4">
+
+    <div class="top-bar mb-4">
+
+      <h2>
+        📲 Notification Viewer
+      </h2>
+
+      <div class="shortcut-box">
+        <span>CTRL + HOME</span> → First Page
+      </div>
+
+    </div>
 
     <div class="row mb-3">
-      <div class="col-md-3">
-        <input type="text" id="username" class="form-control" placeholder="Enter username">
+
+      <div class="col-md-3 mb-3">
+        <input
+          type="text"
+          id="username"
+          class="form-control"
+          placeholder="Enter username"
+        >
       </div>
-      <div class="col-md-3">
-        <input type="date" id="startDate" class="form-control">
+
+      <div class="col-md-3 mb-3">
+        <input
+          type="date"
+          id="startDate"
+          class="form-control"
+        >
       </div>
-      <div class="col-md-3">
-        <input type="date" id="endDate" class="form-control">
+
+      <div class="col-md-3 mb-3">
+        <input
+          type="date"
+          id="endDate"
+          class="form-control"
+        >
       </div>
-      <div class="col-md-3">
-        <select id="packageFilter" class="form-select">
-          <option value="">📦 All Packages</option>
+
+      <div class="col-md-3 mb-3">
+        <select
+          id="packageFilter"
+          class="form-select"
+        >
+          <option value="">
+            📦 All Packages
+          </option>
         </select>
       </div>
+
     </div>
 
-    <div class="mb-3">
-      <button class="btn btn-primary" onclick="loadNotifications()">🔍 Fetch Notifications</button>
+    <div class="d-flex gap-3 flex-wrap mb-4">
+
+      <button
+        class="btn btn-primary"
+        onclick="loadNotifications()"
+      >
+        🔍 Fetch Notifications
+      </button>
+
+      <button
+        class="btn btn-danger-custom"
+        onclick="goToFirstPage()"
+      >
+        ⏮ First Page
+      </button>
+
     </div>
 
-    <div id="notifications" class="row g-3"></div>
+    <div
+      id="notifications"
+      class="row g-4"
+    ></div>
 
-    <div class="d-flex justify-content-between align-items-center mt-4">
-      <button class="btn btn-secondary" id="prevPage">⏮ Previous</button>
-      <span id="pageInfo">Page 1</span>
-      <button class="btn btn-secondary" id="nextPage">Next ⏭</button>
+    <div class="d-flex justify-content-between align-items-center mt-5 flex-wrap gap-3">
+
+      <button
+        class="btn btn-secondary"
+        id="prevPage"
+      >
+        ⬅ Previous
+      </button>
+
+      <span id="pageInfo">
+        Page 1
+      </span>
+
+      <button
+        class="btn btn-secondary"
+        id="nextPage"
+      >
+        Next ➡
+      </button>
+
     </div>
+
+    <div class="footer-glow"></div>
+
   </div>
 
   <script>
+
     let currentPage = 1;
     let totalPages = 1;
 
     async function loadNotifications() {
-      const username = document.getElementById('username').value.trim();
-      const start = document.getElementById('startDate').value;
-      const end = document.getElementById('endDate').value;
-      const packageName = document.getElementById('packageFilter').value;
 
-      if (!username) return alert("⚠ Please enter a username");
+      const username =
+        document.getElementById('username')
+        .value
+        .trim();
+
+      const start =
+        document.getElementById('startDate')
+        .value;
+
+      const end =
+        document.getElementById('endDate')
+        .value;
+
+      const packageName =
+        document.getElementById('packageFilter')
+        .value;
+
+      if (!username) {
+        return alert("Please enter a username");
+      }
 
       const params = new URLSearchParams({
         page: currentPage,
         limit: 9
       });
 
-      if (start) params.append("start", start);
-      if (end) params.append("end", end);
-      if (packageName) params.append("package", packageName);
+      if (start) {
+        params.append("start", start);
+      }
 
-      const res = await fetch(`/notifications/${username}?${params}`);
+      if (end) {
+        params.append("end", end);
+      }
+
+      if (packageName) {
+        params.append("package", packageName);
+      }
+
+      const res = await fetch(
+        `/notifications/${username}?${params}`
+      );
+
       const data = await res.json();
 
-      const list = document.getElementById('notifications');
+      const list =
+        document.getElementById('notifications');
+
       list.innerHTML = '';
 
       data.notifications.forEach(n => {
-        const card = document.createElement('div');
+
+        const card =
+          document.createElement('div');
+
         card.className = "col-md-4";
-        const time = new Date(n.timestamp).toLocaleString();
+
+        const time =
+          new Date(n.timestamp)
+          .toLocaleString();
+
         card.innerHTML = `
-          <div class="card shadow-sm">
+          <div class="card h-100 shadow-sm">
             <div class="card-body">
-              <h6 class="card-title">${n.package}</h6>
-              <p class="card-text"><strong>${n.title}</strong><br>${n.text}</p>
-              <small class="text-muted">${time}</small>
+
+              <h6 class="card-title">
+                ${n.package}
+              </h6>
+
+              <p class="card-text">
+                <strong>${n.title}</strong>
+                <br><br>
+                ${n.text}
+              </p>
+
+              <small class="text-muted">
+                ${time}
+              </small>
+
             </div>
           </div>
         `;
+
         list.appendChild(card);
       });
 
-      currentPage = data.currentPage || 1;
-      totalPages = data.totalPages || 1;
-      document.getElementById('pageInfo').innerText = `Page ${currentPage} of ${totalPages}`;
+      currentPage =
+        data.currentPage || 1;
 
-      updatePackageOptions(data.allPackages || []);
+      totalPages =
+        data.totalPages || 1;
+
+      document.getElementById(
+        'pageInfo'
+      ).innerText =
+        `Page ${currentPage} of ${totalPages}`;
+
+      updatePackageOptions(
+        data.allPackages || []
+      );
     }
 
     function updatePackageOptions(packages) {
-      const select = document.getElementById('packageFilter');
-      const currentValue = select.value;
-      select.innerHTML = `<option value="">📦 All Packages</option>`;
+
+      const select =
+        document.getElementById('packageFilter');
+
+      const currentValue =
+        select.value;
+
+      select.innerHTML =
+        `<option value="">📦 All Packages</option>`;
+
       [...new Set(packages)].forEach(pkg => {
-        const option = document.createElement('option');
+
+        const option =
+          document.createElement('option');
+
         option.value = pkg;
         option.text = pkg;
-        if (pkg === currentValue) option.selected = true;
+
+        if (pkg === currentValue) {
+          option.selected = true;
+        }
+
         select.appendChild(option);
       });
     }
 
-    document.getElementById('nextPage').addEventListener('click', () => {
-      if (currentPage < totalPages) {
-        currentPage++;
-        loadNotifications();
+    function goToFirstPage() {
+
+      currentPage = 1;
+
+      loadNotifications();
+    }
+
+    document
+      .getElementById('nextPage')
+      .addEventListener('click', () => {
+
+        if (currentPage < totalPages) {
+          currentPage++;
+          loadNotifications();
+        }
+      });
+
+    document
+      .getElementById('prevPage')
+      .addEventListener('click', () => {
+
+        if (currentPage > 1) {
+          currentPage--;
+          loadNotifications();
+        }
+      });
+
+    document.addEventListener('keydown', (e) => {
+
+      if (e.ctrlKey && e.key === 'Home') {
+
+        e.preventDefault();
+
+        goToFirstPage();
       }
     });
 
-    document.getElementById('prevPage').addEventListener('click', () => {
-      if (currentPage > 1) {
-        currentPage--;
-        loadNotifications();
-      }
-    });
   </script>
+
 </body>
 </html>
