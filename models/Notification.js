@@ -15,4 +15,11 @@ const notificationSchema = new mongoose.Schema({
   }
 });
 
+
+notificationSchema.index({
+  user: 1,
+  package: 1,
+  timestamp: -1
+});
+
 export default mongoose.model('Notification', notificationSchema);
