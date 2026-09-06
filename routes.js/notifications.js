@@ -4,6 +4,8 @@ import User from '../models/User.js';
 
 const router = express.Router();
 
+const userCache = new Map();
+
 // 🔹 Get all notifications for a user
 router.get('/notifications/:username', async (req, res) => {
   try {
@@ -14,13 +16,22 @@ router.get('/notifications/:username', async (req, res) => {
     const pageNum = Number(page) || 1;
     const limitNum = Number(limit) || 9;
 
-    const user = await User.findOne({ username }).lean();
+let userId = userCache.get(username);
 
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
+if (!userId) {
+  const user = await User.findOne({ username })
+    .select('_id')
+    .lean();
 
-    const query = { user: user._id };
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  userId = user._id;
+  userCache.set(username, userId);
+}
+
+    const query = { user: userId };
 
     // date filters
     if (start || end) {
@@ -51,7 +62,7 @@ router.get('/notifications/:username', async (req, res) => {
         .populate('user', 'username')
         .lean(),
 
-      Notification.distinct('package', { user: user._id })
+      Notification.distinct('package', { user: userId })
     ]);
 
     // EXACT SAME response structure
